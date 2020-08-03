@@ -15,14 +15,22 @@ class Player(pygame.sprite.Sprite):
         self.velocity = [CELL_SIZE, 0]
 
     def change_direction(self, key):
+        head_pos= self.body_list[-1].topleft
+        neck_pos= self.body_list[-2].topleft
+        x_change = neck_pos[0] - head_pos[0] 
+        y_change = neck_pos[1] - head_pos[1]
         if key == pygame.K_RIGHT:
-            self.velocity = [CELL_SIZE,0]
+            if x_change <= 0:
+                self.velocity = [CELL_SIZE,0]
         if key == pygame.K_LEFT:
-            self.velocity = [-1*CELL_SIZE,0]
+            if x_change >= 0:
+                self.velocity = [-1*CELL_SIZE,0]
         if key == pygame.K_UP:
-            self.velocity = [0, -1*CELL_SIZE]
+            if y_change >= 0:
+                self.velocity = [0, -1*CELL_SIZE]
         if key == pygame.K_DOWN:
-            self.velocity = [0,CELL_SIZE]
+            if y_change <= 0:
+                self.velocity = [0,CELL_SIZE]
 
     def update(self):
         if self.alive:
