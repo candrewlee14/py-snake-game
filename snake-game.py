@@ -28,10 +28,7 @@ def main():
         dt = clock.tick(FPS) / 1000 
         screen.fill(BLACK)
 
-        for event in pygame.event.get():
-            #moves the player every time this event ticks
-            if event.type == MOVEEVENT:
-                player.update()            
+        for event in pygame.event.get():           
             if event.type == pygame.QUIT:
                 running = False
                 start = False
@@ -48,37 +45,39 @@ def main():
                 #otherwise, change velocity direction of player with arrow keys          
                 else:
                     player.change_direction(event.key)
+            #moves the player every time this event ticks
+            elif event.type == MOVEEVENT:
+                player.update() 
+                #if player runs into food, mark it as eating food, relocate food, and change score text
+                if player.body_list[-1].center == food.rect.center:
+                    player.ate_food = True
+                    food.relocate([rect.topleft for rect in player.body_list])
+                    score_img = font.render(str(len(player.body_list)), True, WHITE)
 
-        #if player runs into food, mark it as eating food, relocate food, and change score text
-        if player.body_list[-1].center == food.rect.center:
-            player.ate_food = True
-            food.relocate([rect.topleft for rect in player.body_list])
-            score_img = font.render(str(len(player.body_list)), True, WHITE)
-
-        head = player.body_list[-1]
-        uncrashed = True
-        #check head is not hitting any body part
-        for item in player.body_list[:-1]:
-            uncrashed &= (item.center != head.center)
-        #check head is not hitting any wall
-        uncrashed &= head.right <= SCREEN_SIZE
-        uncrashed &= head.left >= 0
-        uncrashed &= head.bottom <= SCREEN_SIZE
-        uncrashed &= head.top >= 0
-        #draw score, food, and player
-        screen.blit(score_img, (20, 20))
-        player.draw(screen)
-        food.draw(screen)
-        #if it crashed, set player as dead and draw "game over" text on top layer
-        if not uncrashed:
-            player.alive = False
-            game_over_img = bigfont.render('Game Over', True, RED)
-            game_over_rect = game_over_img.get_rect()
-            pygame.draw.rect(game_over_img, RED, game_over_rect, 3)
-            screen.blit(game_over_img, (SCREEN_SIZE/2 -game_over_img.get_width() / 2, SCREEN_SIZE/2 - game_over_img.get_height() / 2))
-            instructions_img = font.render('Press R to Restart, E to End', True, RED)
-            screen.blit(instructions_img, (SCREEN_SIZE/2 - instructions_img.get_width() / 2, SCREEN_SIZE/2 + game_over_img.get_height()))
-        pygame.display.update()
+                head = player.body_list[-1]
+                uncrashed = True
+                #check head is not hitting any body part
+                for item in player.body_list[:-1]:
+                    uncrashed &= (item.center != head.center)
+                #check head is not hitting any wall
+                uncrashed &= head.right <= SCREEN_SIZE
+                uncrashed &= head.left >= 0
+                uncrashed &= head.bottom <= SCREEN_SIZE
+                uncrashed &= head.top >= 0
+                #draw score, food, and player
+                screen.blit(score_img, (20, 20))
+                player.draw(screen)
+                food.draw(screen)
+                #if it crashed, set player as dead and draw "game over" text on top layer
+                if not uncrashed:
+                    player.alive = False
+                    game_over_img = bigfont.render('Game Over', True, RED)
+                    game_over_rect = game_over_img.get_rect()
+                    pygame.draw.rect(game_over_img, RED, game_over_rect, 3)
+                    screen.blit(game_over_img, (SCREEN_SIZE/2 -game_over_img.get_width() / 2, SCREEN_SIZE/2 - game_over_img.get_height() / 2))
+                    instructions_img = font.render('Press R to Restart, E to End', True, RED)
+                    screen.blit(instructions_img, (SCREEN_SIZE/2 - instructions_img.get_width() / 2, SCREEN_SIZE/2 + game_over_img.get_height()))
+                pygame.display.update()
 
 #restart unless user quits or presses E after dying
 while start:
