@@ -52,7 +52,7 @@ def main():
         #if player runs into food, mark it as eating food, relocate food, and change score text
         if player.body_list[-1].center == food.rect.center:
             player.ate_food = True
-            food.relocate()
+            food.relocate([rect.topleft for rect in player.body_list])
             score_img = font.render(str(len(player.body_list)), True, WHITE)
 
         head = player.body_list[-1]
