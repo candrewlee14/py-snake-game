@@ -65,7 +65,11 @@ def main():
         uncrashed &= head.left >= 0
         uncrashed &= head.bottom <= SCREEN_SIZE
         uncrashed &= head.top >= 0
-        #if it crashed, set player as dead and show game over text
+        #draw score, food, and player
+        screen.blit(score_img, (20, 20))
+        player.draw(screen)
+        food.draw(screen)
+        #if it crashed, set player as dead and draw "game over" text on top layer
         if not uncrashed:
             player.alive = False
             game_over_img = bigfont.render('Game Over', True, RED)
@@ -74,9 +78,6 @@ def main():
             screen.blit(game_over_img, (SCREEN_SIZE/2 -game_over_img.get_width() / 2, SCREEN_SIZE/2 - game_over_img.get_height() / 2))
             instructions_img = font.render('Press R to Restart, E to End', True, RED)
             screen.blit(instructions_img, (SCREEN_SIZE/2 - instructions_img.get_width() / 2, SCREEN_SIZE/2 + game_over_img.get_height()))
-        screen.blit(score_img, (20, 20))
-        player.draw(screen)
-        food.draw(screen)
         pygame.display.update()
 
 #restart unless user quits or presses E after dying
