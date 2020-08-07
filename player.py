@@ -15,6 +15,9 @@ class Player(pygame.sprite.Sprite):
         #set line width as a bit smaller than the head size, but it must be odd so it line is centered (per pygame docs)
         self.line_width = floor((CELL_SIZE * .45)) * 2 + 1
 
+    def move_tuple(self, topleft: tuple):
+        return tuple([(a+b) % SCREEN_SIZE for a, b in zip(topleft, self.velocity)])
+
     def change_direction(self, key):
         head_pos= self.body_list[-1].topleft
         more_than_one = len(self.body_list) > 1
@@ -41,13 +44,16 @@ class Player(pygame.sprite.Sprite):
             tail = self.body_list[0].copy()
             for i in range(len(self.body_list)-1):
                 self.body_list[i] = self.body_list[i+1].copy()
-            self.body_list[-1].move_ip(*self.velocity)
+            self.body_list[-1].topleft = self.move_tuple(self.body_list[-1].topleft)
             if self.ate_food:
                 self.body_list.insert(0, tail)
             self.ate_food = False
     
     def draw(self, screen):
         for i in range(0, len(self.body_list) - 1):
+            difference = tuple([abs(a-b) for a, b in zip(self.body_list[i], self.body_list[i+1])])
+            if difference[0] > CELL_SIZE or difference[1] > CELL_SIZE:
+                continue
             pygame.draw.line(screen, 
                 WHITE, 
                 self.body_list[i].center,
