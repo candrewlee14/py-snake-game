@@ -4,6 +4,7 @@ from numpy import arange
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+HEAD_COLOR = (160,160,250)
 FPS = 60
 SCREEN_SIZE = 720
 NUMBER_OF_CELLS_ACROSS = 60

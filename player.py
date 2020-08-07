@@ -43,5 +43,6 @@ class Player(pygame.sprite.Sprite):
             self.ate_food = False
     
     def draw(self, screen):
-        for item in self.body_list:
+        for item in self.body_list[-1]:
             pygame.draw.rect(screen, WHITE, item)
+        pygame.draw.rect(screen, HEAD_COLOR, self.body_list[-1])
