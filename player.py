@@ -7,9 +7,8 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.ate_food = False
         self.alive = True
-        self.body_list = [
-                pygame.Rect(0,0, CELL_SIZE, CELL_SIZE),
-            ]
+        self.dying_frame = 0
+        self.body_list = [pygame.Rect(0,0, CELL_SIZE, CELL_SIZE)]
         self.image = pygame.Surface((CELL_SIZE, CELL_SIZE))
         self.velocity = [CELL_SIZE, 0]
         #set line width as a bit smaller than the head size, but it must be odd so it line is centered (per pygame docs)

@@ -47,37 +47,51 @@ def main():
                     player.change_direction(event.key)
             #moves the player every time this event ticks
             elif event.type == MOVEEVENT:
-                player.update() 
-                #if player runs into food, mark it as eating food, relocate food, and change score text
-                if player.body_list[-1].center == food.rect.center:
-                    player.ate_food = True
-                    food.relocate([rect.topleft for rect in player.body_list])
-                    score_img = font.render(str(len(player.body_list)), True, WHITE)
+                if player.dying_frame == 0:
+                    player.update() 
+                    #if player runs into food, mark it as eating food, relocate food, and change score text
+                    if player.body_list[-1].center == food.rect.center:
+                        player.ate_food = True
+                        food.relocate([rect.topleft for rect in player.body_list])
+                        score_img = font.render(str(len(player.body_list)), True, WHITE)
 
-                head = player.body_list[-1]
-                uncrashed = True
-                #check head is not hitting any body part
-                for item in player.body_list[:-1]:
-                    uncrashed &= (item.center != head.center)
-                #check head is not hitting any wall
-                uncrashed &= head.right <= SCREEN_SIZE
-                uncrashed &= head.left >= 0
-                uncrashed &= head.bottom <= SCREEN_SIZE
-                uncrashed &= head.top >= 0
-                #draw score, food, and player
-                screen.blit(score_img, (20, 20))
-                player.draw(screen)
-                food.draw(screen)
-                #if it crashed, set player as dead and draw "game over" text on top layer
-                if not uncrashed:
-                    player.alive = False
-                    game_over_img = bigfont.render('Game Over', True, RED)
-                    game_over_rect = game_over_img.get_rect()
-                    pygame.draw.rect(game_over_img, RED, game_over_rect, 3)
-                    screen.blit(game_over_img, (SCREEN_SIZE/2 -game_over_img.get_width() / 2, SCREEN_SIZE/2 - game_over_img.get_height() / 2))
-                    instructions_img = font.render('Press R to Restart, E to End', True, RED)
-                    screen.blit(instructions_img, (SCREEN_SIZE/2 - instructions_img.get_width() / 2, SCREEN_SIZE/2 + game_over_img.get_height()))
-                pygame.display.update()
+                    head = player.body_list[-1]
+                    uncrashed = True
+                    future_uncrashed = True
+                    #check head is not hitting any body part
+                    for item in player.body_list[:-1]:
+                        uncrashed &= (item.center != head.center)
+                    #check head is not hitting any wall
+                    uncrashed &= head.right <= SCREEN_SIZE
+                    uncrashed &= head.left >= 0
+                    uncrashed &= head.bottom <= SCREEN_SIZE
+                    uncrashed &= head.top >= 0
+                    #draw score, food, and player
+                    screen.blit(score_img, (20, 20))
+                    player.draw(screen)
+                    food.draw(screen)
+                    #if player has died, set player as dead and draw "game over" text on top layer
+                    if not uncrashed:
+                        player.alive = False
+                        game_over_img = bigfont.render('Game Over', True, RED)
+                        game_over_rect = game_over_img.get_rect()
+                        pygame.draw.rect(game_over_img, RED, game_over_rect, 3)
+                        screen.blit(game_over_img, (SCREEN_SIZE/2 -game_over_img.get_width() / 2, SCREEN_SIZE/2 - game_over_img.get_height() / 2))
+                        instructions_img = font.render('Press R to Restart, E to End', True, RED)
+                        screen.blit(instructions_img, (SCREEN_SIZE/2 - instructions_img.get_width() / 2, SCREEN_SIZE/2 + game_over_img.get_height()))
+                    else:
+                        #if it hasn't crashed yet, check if player is about to crash, and set of the grace frames
+                        for item in player.body_list[:-1]:
+                            future_uncrashed &= (item.center != tuple([a+b for a, b in zip(head.center, player.velocity)]))
+                        if not future_uncrashed and player.dying_frame == 0:
+                            player.dying_frame = 1
+                    pygame.display.update()
+                else:
+                    #go here until the grace_frames are up then go back to normal running
+                    if player.dying_frame < GRACE_FRAMES:
+                        player.dying_frame += 1
+                    else:
+                        player.dying_frame = 0
 
 #restart unless user quits or presses E after dying
 while start:
