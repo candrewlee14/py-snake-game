@@ -24,6 +24,7 @@ def main():
     player = Player()
     score_img = font.render('1', True, WHITE)
     running = True
+    key_queue = []
     while running:
         dt = clock.tick(FPS) / 1000 
         screen.fill(BLACK)
@@ -44,9 +45,13 @@ def main():
                     exit()   
                 #otherwise, change velocity direction of player with arrow keys          
                 else:
-                    player.change_direction(event.key)
+                    if len(key_queue) <= 3:
+                        key_queue.insert(0, event.key)
+                    
             #moves the player every time this event ticks
             elif event.type == MOVEEVENT:
+                if len(key_queue) > 0:
+                    player.change_direction(key_queue.pop())
                 if player.dying_frame == 0:
                     player.update() 
                     #if player runs into food, mark it as eating food, relocate food, and change score text
