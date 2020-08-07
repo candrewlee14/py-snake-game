@@ -1,5 +1,6 @@
 
 from settings import *
+from math import floor
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -8,17 +9,20 @@ class Player(pygame.sprite.Sprite):
         self.alive = True
         self.body_list = [
                 pygame.Rect(0,0, CELL_SIZE, CELL_SIZE),
-                pygame.Rect(0,CELL_SIZE, CELL_SIZE, CELL_SIZE),
-                pygame.Rect(0,CELL_SIZE*2, CELL_SIZE, CELL_SIZE)
             ]
         self.image = pygame.Surface((CELL_SIZE, CELL_SIZE))
         self.velocity = [CELL_SIZE, 0]
+        #set line width as a bit smaller than the head size, but it must be odd so it line is centered (per pygame docs)
+        self.line_width = floor((CELL_SIZE * .45)) * 2 + 1
 
     def change_direction(self, key):
         head_pos= self.body_list[-1].topleft
-        neck_pos= self.body_list[-2].topleft
-        x_change = neck_pos[0] - head_pos[0] 
-        y_change = neck_pos[1] - head_pos[1]
+        more_than_one = len(self.body_list) > 1
+        x_change, y_change = 0, 0
+        if more_than_one:
+            neck_pos= self.body_list[-2].topleft
+            x_change = neck_pos[0] - head_pos[0] 
+            y_change = neck_pos[1] - head_pos[1]
         if key == pygame.K_RIGHT:
             if x_change <= 0:
                 self.velocity = [CELL_SIZE,0]
@@ -43,6 +47,10 @@ class Player(pygame.sprite.Sprite):
             self.ate_food = False
     
     def draw(self, screen):
-        for item in self.body_list[-1]:
-            pygame.draw.rect(screen, WHITE, item)
+        for i in range(0, len(self.body_list) - 1):
+            pygame.draw.line(screen, 
+                WHITE, 
+                self.body_list[i].center,
+                self.body_list[i+1].center, 
+                self.line_width)
         pygame.draw.rect(screen, HEAD_COLOR, self.body_list[-1])
